@@ -56,10 +56,12 @@ function updateInvestigatorStats(i, stats) {
   header.innerHTML = `
         <h3>조사자 ${i + 1}</h3>
         <div>
-          <img src="images/action.png" class="action-icon" alt="행동" onclick="changeStat(${i},'actions',1)" oncontextmenu="event.preventDefault(); changeStat(${i},'actions',-1)">
-          <span class="actions-count" onclick="changeStat(${i},'actions',1)" oncontextmenu="event.preventDefault(); changeStat(${i},'actions',-1)">${
-    stats.actions
-  }</span>
+          <span class="actions-btn" 
+            style="display:flex;justify-content:center;align-items:center;width:36px;height:36px;background-image:url('images/action.png');background-size:contain;background-repeat:no-repeat;" 
+            onclick="changeStat(${i},'actions',1)" 
+            oncontextmenu="event.preventDefault(); changeStat(${i},'actions',-1)">
+            ${stats.actions}
+          </span>
         </div>`;
 
   // abilities
@@ -170,7 +172,7 @@ async function setupPlayers() {
       `<div class="left-panel">` +
       `<button class="reset-btn" onclick="resetStats(${i})">리셋</button>` +
       `<div class="header"></div>` +
-      `<div class="investigator-select"><label></label>` +
+      `<div class="investigator-select">` +
       `<select id="investigator-select-${i}" onchange="selectInvestigator(${i})">` +
       Object.entries(investigatorCodes)
         .map(([name, code]) => `<option value="${code}">${name}</option>`)
