@@ -13,36 +13,40 @@ const investigatorCodes = {
   "조이 사마라스": "02001",
   "로랜드 뱅크스": "01001",
   "데이지 워커": "01002",
-  "위니프레드 해버먹": "60301",
 };
 
 async function fetchInvestigatorData(code) {
-  const response = await fetch(`https://arkhamdb.com/api/public/card/${code}`, {
-    headers: {
-      "Accept-Language": "ko",
-    },
+  const res = await fetch(`https://arkhamdb.com/api/public/card/${code}`, {
+    headers: { "Accept-Language": "ko" },
   });
-  if (!response.ok) throw new Error(`API 요청 실패: ${response.status}`);
-  return await response.json();
+  if (!res.ok) throw new Error(`API 요청 실패: ${res.status}`);
+  return res.json();
 }
 
 function createStatElement(name, label, value, idx) {
-  return `<div class="stat"><label>${label}</label><button onclick="changeStat(${idx}, '${name}', -1)">-</button><span class="value" id="${name}-${idx}">${value}</span><button onclick="changeStat(${idx}, '${name}', 1)">+</button></div>`;
+  return (
+    `<div class="stat"><label>${label}</label>` +
+    `<button onclick="changeStat(${idx},'${name}',-1)">-</button>` +
+    `<span class="value" id="${name}-${idx}">${value}</span>` +
+    `<button onclick="changeStat(${idx},'${name}',1)">+</button></div>`
+  );
 }
 
-function updateInvestigatorStats(index, stats) {
-  const card = document.getElementById(`investigator-${index}`);
-  card.querySelector(".abilities").innerHTML = `
-        <span>${stats.willpower}</span><span>${stats.intellect}</span><span>${stats.combat}</span><span>${stats.agility}</span>`;
-  card.querySelector(`#health-${index}`).textContent = stats.health;
-  card.querySelector(`#sanity-${index}`).textContent = stats.sanity;
-  card.querySelector(`#clues-${index}`).textContent = stats.clues;
-  card.querySelector(`#actions-${index}`).textContent = stats.actions;
-  card.querySelector(`#ability-${index}`).textContent = stats.ability;
+function updateInvestigatorStats(i, stats) {
+  const card = document.getElementById(`investigator-${i}`);
+  card.querySelector(".abilities").innerHTML =
+    `<span><img src="images/willpower.png" class="ability-icon" alt="의지">${stats.willpower}</span>` +
+    `<span><img src="images/intellect.png" class="ability-icon" alt="지식">${stats.intellect}</span>` +
+    `<span><img src="images/combat.png" class="ability-icon" alt="힘">${stats.combat}</span>` +
+    `<span><img src="images/agility.png" class="ability-icon" alt="민첩">${stats.agility}</span>`;
+  ["health", "sanity", "clues", "actions"].forEach((stat) => {
+    card.querySelector(`#${stat}-${i}`).textContent = stats[stat];
+  });
+  card.querySelector(`#ability-${i}`).textContent = stats.ability;
 }
 
-async function selectInvestigator(index) {
-  const name = document.getElementById(`investigator-select-${index}`).value;
+async function selectInvestigator(i) {
+  const name = document.getElementById(`investigator-select-${i}`).value;
   const code = investigatorCodes[name];
   try {
     const data = await fetchInvestigatorData(code);
@@ -57,29 +61,27 @@ async function selectInvestigator(index) {
       actions: 3,
       ability: data.text || "",
     };
-    localStorage.setItem(`investigator-${index}`, JSON.stringify(stats));
-    updateInvestigatorStats(index, stats);
+    localStorage.setItem(`investigator-${i}`, JSON.stringify(stats));
+    updateInvestigatorStats(i, stats);
   } catch (e) {
     alert(e.message);
   }
 }
 
-function changeStat(index, stat, delta) {
-  const elem = document.getElementById(`${stat}-${index}`);
-  let value = parseInt(elem.textContent) + delta;
-  if (value < 0) value = 0;
-  elem.textContent = value;
-  const saved = JSON.parse(localStorage.getItem(`investigator-${index}`)) || {
+function changeStat(i, stat, delta) {
+  const el = document.getElementById(`${stat}-${i}`);
+  let val = parseInt(el.textContent) + delta;
+  if (val < 0) val = 0;
+  el.textContent = val;
+  const saved = JSON.parse(localStorage.getItem(`investigator-${i}`)) || {
     ...defaultStats,
   };
-  saved[stat] = value;
-  localStorage.setItem(`investigator-${index}`, JSON.stringify(saved));
+  saved[stat] = val;
+  localStorage.setItem(`investigator-${i}`, JSON.stringify(saved));
 }
 
-function resetStats(index) {
-  const stats = { ...defaultStats, clues: 0, actions: 3 };
-  localStorage.setItem(`investigator-${index}`, JSON.stringify(stats));
-  updateInvestigatorStats(index, stats);
+function resetStats(i) {
+  selectInvestigator(i);
 }
 
 function resetAllStats() {
@@ -95,30 +97,34 @@ async function setupPlayers() {
     const saved = JSON.parse(localStorage.getItem(`investigator-${i}`)) || {
       ...defaultStats,
     };
-    const html = `
-          <div class="investigator" id="investigator-${i}">
-            <button class="reset-btn" onclick="resetStats(${i})">리셋</button>
-            <h3>조사자 ${i + 1}</h3>
-            <div class="investigator-select">
-              <label>선택:</label>
-              <select id="investigator-select-${i}" onchange="selectInvestigator(${i})">
-                <option>조이 사마라스</option>
-                <option>로랜드 뱅크스</option>
-                <option>데이지 워커</option>
-                <option>위니프레드 해버먹</option>
-              </select>
-            </div>
-            <div class="abilities"><span>${saved.willpower}</span><span>${
-      saved.intellect
-    }</span><span>${saved.combat}</span><span>${saved.agility}</span></div>
-            ${createStatElement("health", "체력", saved.health, i)}
-            ${createStatElement("sanity", "정신력", saved.sanity, i)}
-            ${createStatElement("clues", "단서", saved.clues, i)}
-            ${createStatElement("actions", "행동 수", saved.actions, i)}
-            <div class="ability-description" id="ability-${i}">${
-      saved.ability
-    }</div>
-          </div>`;
+    const html =
+      `<div class="investigator" id="investigator-${i}">` +
+      `<div class="left-panel">` +
+      `<button class="reset-btn" onclick="resetStats(${i})">리셋</button>` +
+      `<h3>조사자 ${i + 1}</h3>` +
+      `<div class="investigator-select">` +
+      `<label>선택:</label>` +
+      `<select id="investigator-select-${i}" onchange="selectInvestig ator(${i})">` +
+      `<option>조이 사마라스</option>` +
+      `<option>로랜드 뱅크스</option>` +
+      `<option>데이지 워커</option>` +
+      `</select>` +
+      `</div>` +
+      `<div class="abilities">` +
+      `<span><img src="images/willpower.png" class="ability-icon" alt="의지">${saved.willpower}</span>` +
+      `<span><img src="images/intellect.png" class="ability-icon" alt="지식">${saved.intellect}</span>` +
+      `<span><img src="images/combat.png" class="ability-icon" alt="힘">${saved.combat}</span>` +
+      `<span><img src="images/agility.png" class="ability-icon" alt="민첩">${saved.agility}</span>` +
+      `</div>` +
+      createStatElement("health", "체력", saved.health, i) +
+      createStatElement("sanity", "정신력", saved.sanity, i) +
+      createStatElement("clues", "단서", saved.clues, i) +
+      createStatElement("actions", "행동 수", saved.actions, i) +
+      `</div>` +
+      `<div class="right-panel">` +
+      `<div class="ability-description" id="ability-${i}">${saved.ability}</div>` +
+      `</div>` +
+      `</div>`;
     area.insertAdjacentHTML("beforeend", html);
     document.getElementById(`investigator-select-${i}`).value = Object.keys(
       investigatorCodes
