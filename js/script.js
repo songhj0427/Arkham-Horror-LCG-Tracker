@@ -9,10 +9,17 @@ const defaultStats = {
   agility: 0,
   ability: "",
 };
-const investigatorCodes = {
-  "조이 사마라스": "02001",
+let investigatorList = [
+  "로랜드 뱅크스",
+  "데이지 워커",
+  "조이 사마라스",
+  "위니프레드 해버먹",
+];
+let investigatorCodes = {
   "로랜드 뱅크스": "01001",
   "데이지 워커": "01002",
+  "조이 사마라스": "02001",
+  "위니프레드 해버먹": "60301",
 };
 
 async function fetchInvestigatorData(code) {
@@ -35,14 +42,31 @@ function createStatElement(name, label, value, idx) {
 function updateInvestigatorStats(i, stats) {
   const card = document.getElementById(`investigator-${i}`);
   card.querySelector(".abilities").innerHTML =
-    `<span><img src="images/willpower.png" class="ability-icon" alt="의지">${stats.willpower}</span>` +
-    `<span><img src="images/intellect.png" class="ability-icon" alt="지식">${stats.intellect}</span>` +
-    `<span><img src="images/combat.png" class="ability-icon" alt="힘">${stats.combat}</span>` +
-    `<span><img src="images/agility.png" class="ability-icon" alt="민첩">${stats.agility}</span>`;
+    `<span onclick="changeAbility(${i}, 'willpower', 1)" oncontextmenu="changeAbility(${i}, 'willpower', -1); return false;">` +
+    `<img src="images/willpower.png" class="ability-icon" alt="의지">${stats.willpower}` +
+    `</span>` +
+    `<span onclick="changeAbility(${i}, 'intellect', 1)" oncontextmenu="changeAbility(${i}, 'intellect', -1); return false;">` +
+    `<img src="images/intellect.png" class="ability-icon" alt="지식">${stats.intellect}` +
+    `</span>` +
+    `<span onclick="changeAbility(${i}, 'combat', 1)" oncontextmenu="changeAbility(${i}, 'combat', -1); return false;">` +
+    `<img src="images/combat.png" class="ability-icon" alt="힘">${stats.combat}` +
+    `</span>` +
+    `<span onclick="changeAbility(${i}, 'agility', 1)" oncontextmenu="changeAbility(${i}, 'agility', -1); return false;">` +
+    `<img src="images/agility.png" class="ability-icon" alt="민첩">${stats.agility}` +
+    `</span>`;
   ["health", "sanity", "clues", "actions"].forEach((stat) => {
     card.querySelector(`#${stat}-${i}`).textContent = stats[stat];
   });
   card.querySelector(`#ability-${i}`).textContent = stats.ability;
+}
+
+function changeAbility(i, stat, delta) {
+  const saved = JSON.parse(localStorage.getItem(`investigator-${i}`)) || {
+    ...defaultStats,
+  };
+  saved[stat] = Math.max(0, saved[stat] + delta);
+  localStorage.setItem(`investigator-${i}`, JSON.stringify(saved));
+  updateInvestigatorStats(i, saved);
 }
 
 async function selectInvestigator(i) {
@@ -104,18 +128,11 @@ async function setupPlayers() {
       `<h3>조사자 ${i + 1}</h3>` +
       `<div class="investigator-select">` +
       `<label>선택:</label>` +
-      `<select id="investigator-select-${i}" onchange="selectInvestig ator(${i})">` +
-      `<option>조이 사마라스</option>` +
-      `<option>로랜드 뱅크스</option>` +
-      `<option>데이지 워커</option>` +
+      `<select id="investigator-select-${i}" onchange="selectInvestigator(${i})">` +
+      investigatorList.map((name) => `<option>${name}</option>`).join("") +
       `</select>` +
       `</div>` +
-      `<div class="abilities">` +
-      `<span><img src="images/willpower.png" class="ability-icon" alt="의지">${saved.willpower}</span>` +
-      `<span><img src="images/intellect.png" class="ability-icon" alt="지식">${saved.intellect}</span>` +
-      `<span><img src="images/combat.png" class="ability-icon" alt="힘">${saved.combat}</span>` +
-      `<span><img src="images/agility.png" class="ability-icon" alt="민첩">${saved.agility}</span>` +
-      `</div>` +
+      `<div class="abilities"></div>` +
       createStatElement("health", "체력", saved.health, i) +
       createStatElement("sanity", "정신력", saved.sanity, i) +
       createStatElement("clues", "단서", saved.clues, i) +
@@ -123,8 +140,7 @@ async function setupPlayers() {
       `</div>` +
       `<div class="right-panel">` +
       `<div class="ability-description" id="ability-${i}">${saved.ability}</div>` +
-      `</div>` +
-      `</div>`;
+      `</div></div>`;
     area.insertAdjacentHTML("beforeend", html);
     document.getElementById(`investigator-select-${i}`).value = Object.keys(
       investigatorCodes
@@ -133,6 +149,7 @@ async function setupPlayers() {
         JSON.parse(localStorage.getItem(`investigator-${i}`))?.willpower ===
           saved.willpower && name
     );
+    updateInvestigatorStats(i, saved);
   }
 }
 
