@@ -115,7 +115,8 @@ body {
   align-items: center;
   padding: 0.5rem;
   font-size: 1.25rem;
-  color: white;
+  color: rgb(255, 255, 255);
+  text-shadow: -1px 0px black, 0px 1px black, 1px 0px black, 0px -1px black;
   cursor: pointer;
   background-size: contain;
   background-repeat: no-repeat;

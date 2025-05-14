@@ -92,7 +92,7 @@ function updateInvestigatorStats(i, stats) {
     };
   });
 
-  card.querySelector(`#ability-${i}`).textContent = stats.ability;
+  card.querySelector(`#ability-${i}`).innerHTML = stats.ability;
   localStorage.setItem(`investigator-${i}`, JSON.stringify(stats));
 }
 
@@ -134,7 +134,7 @@ async function selectInvestigator(i) {
       health: data.health,
       sanity: data.sanity,
       clues: 0,
-      resources: 0,
+      resources: 5,
       actions: 3,
       ability: data.text || "",
       maxHealth: data.health,
