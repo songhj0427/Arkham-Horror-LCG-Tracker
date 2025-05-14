@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arkham Horror 조사자 추적기</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="controls">
+      <div>
+        <label for="playerCount">인원 수 선택:</label>
+        <select id="playerCount">
+          <option value="1">1명</option>
+          <option value="2">2명</option>
+          <option value="3">3명</option>
+          <option value="4">4명</option>
+        </select>
+        <button onclick="setupPlayers()">설정</button>
+      </div>
+      <button class="reset-all-btn" onclick="resetAllStats()">전체 리셋</button>
+    </div>
+
+    <div class="investigator-area" id="investigatorArea"></div>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
