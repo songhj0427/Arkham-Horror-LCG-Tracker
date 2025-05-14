@@ -1,0 +1,24 @@
+{
+  "name": "arkham-tracker",
+  "version": "1.0.0",
+  "description": "아컴호러 카드게임 조사자에 대한 기본적인 트래킹 기능을 제공하는 웹페이지\r 아직 기본적인 틀만 잡혀 있음",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/songhj0427/Arkham-Horror-LCG-Tracket.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/songhj0427/Arkham-Horror-LCG-Tracket/issues"
+  },
+  "homepage": "https://github.com/songhj0427/Arkham-Horror-LCG-Tracket#readme",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "express": "^5.1.0"
+  }
+}

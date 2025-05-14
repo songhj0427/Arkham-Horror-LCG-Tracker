@@ -1,0 +1,26 @@
+# node_modules: 의존성 파일 (너무 크고, 자동 설치 가능)
+node_modules/
+
+# 환경 변수 파일: 비밀번호, API 키 등 민감한 정보 포함
+.env
+
+# 로그 파일
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 운영체제 관련
+.DS_Store
+Thumbs.db
+
+# 에디터/IDE 설정 파일
+.vscode/
+.idea/
+*.swp
+
+# 빌드/배포 디렉터리 (필요한 경우)
+dist/
+build/
+
+# 테스트 커버리지 결과
+coverage/
